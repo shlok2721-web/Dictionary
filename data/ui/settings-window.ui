@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.5"/>
+  <template class="SettingsDialog" parent="AdwPreferencesDialog">
+    <property name="title" translatable="yes">Preferences</property>
+    <child>
+      <object class="AdwPreferencesPage">
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">General</property>
+            <child>
+              <object class="AdwSwitchRow" id="dark_ui_switch">
+                <property name="title" translatable="yes">Dark Mode</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="double_click_switch">
+                <property name="title" translatable="yes">Search on Double Click</property>
+                <property name="subtitle" translatable="yes">Double-click a word in a definition to look it up</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="live_search_switch">
+                <property name="title" translatable="yes">Live Search</property>
+                <property name="subtitle" translatable="yes">Search while typing</property>
+              </object>
+            </child>
+            <child>
+              <object class="AdwSwitchRow" id="auto_paste_switch">
+                <property name="title" translatable="yes">Auto-Paste on Launch</property>
+                <property name="subtitle" translatable="yes">Search the clipboard text when the app starts</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="AdwPreferencesGroup">
+            <property name="title" translatable="yes">Pronunciation</property>
+            <child>
+              <object class="AdwComboRow" id="pronunciations_accent_row">
+                <property name="title" translatable="yes">Accent</property>
+                <property name="model">
+                  <object class="GtkStringList">
+                    <items>
+                      <item translatable="yes">American English</item>
+                      <item translatable="yes">British English</item>
+                    </items>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

@@ -1,0 +1,20 @@
+[Unit]
+Description=Dictionary tray icon and clipboard lookup service
+Documentation=https://github.com/shlok2721-web/Dictionary
+# Needs both the session D-Bus (for the tray icon) and a Wayland display
+# (for the mini popup), so tie it to the graphical session rather than a
+# plain default.target.
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=simple
+# dictionary-launcher sets XDG_DATA_DIRS so the bundled database and icon
+# are found regardless of how the session was started.
+ExecStart=%h/.local/bin/dictionary-launcher --background
+Restart=on-failure
+RestartSec=3
+Slice=app.slice
+
+[Install]
+WantedBy=graphical-session.target

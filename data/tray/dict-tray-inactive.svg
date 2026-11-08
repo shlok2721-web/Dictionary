@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="English dictionary app icon" xmlns:c2pa="http://c2pa.org/manifest">
+<defs>
+  <linearGradient id="bg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0.00" stop-color="#313131"/><stop offset="0.20" stop-color="#3f3f3f"/><stop offset="0.40" stop-color="#4d4d4d"/><stop offset="0.60" stop-color="#5c5c5c"/><stop offset="0.80" stop-color="#6a6a6a"/><stop offset="1.00" stop-color="#787878"/></linearGradient>
+  <radialGradient id="halo" cx="512" cy="500" r="470" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#dedede" stop-opacity="0.95"/>
+    <stop offset="0.35" stop-color="#acacac" stop-opacity="0.55"/>
+    <stop offset="1" stop-color="#787878" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="wave1" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#6a6a6a" stop-opacity="0.55"/><stop offset="0.33" stop-color="#858585" stop-opacity="0.55"/><stop offset="0.67" stop-color="#9e9e9e" stop-opacity="0.55"/><stop offset="1.00" stop-color="#b9b9b9" stop-opacity="0.55"/></linearGradient>
+  <linearGradient id="wave2" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#565656" stop-opacity="0.75"/><stop offset="0.33" stop-color="#6f6f6f" stop-opacity="0.75"/><stop offset="0.67" stop-color="#878787" stop-opacity="0.75"/><stop offset="1.00" stop-color="#9f9f9f" stop-opacity="0.75"/></linearGradient>
+  <linearGradient id="cover" x1="0" y1="0" x2="1" y2="1"><stop offset="0.00" stop-color="#404040"/><stop offset="0.33" stop-color="#4f4f4f"/><stop offset="0.67" stop-color="#5f5f5f"/><stop offset="1.00" stop-color="#6f6f6f"/></linearGradient>
+  <linearGradient id="page" x1="0" y1="0" x2="1" y2="1"><stop offset="0.00" stop-color="#f7f7f7"/><stop offset="0.33" stop-color="#eeeeee"/><stop offset="0.67" stop-color="#e7e7e7"/><stop offset="1.00" stop-color="#dfdfdf"/></linearGradient>
+  <linearGradient id="pageR" x1="1" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#f7f7f7"/><stop offset="0.33" stop-color="#eeeeee"/><stop offset="0.67" stop-color="#e7e7e7"/><stop offset="1.00" stop-color="#dfdfdf"/></linearGradient>
+  <linearGradient id="letter" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#4f4f4f"/><stop offset="0.33" stop-color="#666666"/><stop offset="0.67" stop-color="#7d7d7d"/><stop offset="1.00" stop-color="#959595"/></linearGradient>
+  <linearGradient id="ribbon" x1="0" y1="0" x2="0" y2="1"><stop offset="0.00" stop-color="#858585"/><stop offset="0.50" stop-color="#adadad"/><stop offset="1.00" stop-color="#d5d5d5"/></linearGradient>
+  <linearGradient id="spine" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#4e4e4e" stop-opacity="0"/>
+    <stop offset="0.5" stop-color="#4e4e4e" stop-opacity="0.38"/>
+    <stop offset="1" stop-color="#4e4e4e" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#c5c5c5" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+  <filter id="glow" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="glowSm" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="9"/></filter>
+  <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="26"/></filter>
+  <clipPath id="tile"><rect width="1024" height="1024" rx="230"/></clipPath>
+</defs>
+
+<g clip-path="url(#tile)">
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect width="1024" height="1024" fill="url(#halo)"/>
+  <!-- water layers -->
+  <path d="M0,760 C170,700 320,830 512,775 C700,720 850,820 1024,742 L1024,1024 L0,1024 Z" fill="url(#wave1)"/>
+  <path d="M0,850 C200,790 340,900 540,850 C730,805 880,890 1024,830 L1024,1024 L0,1024 Z" fill="url(#wave2)"/>
+  <path d="M0,930 C240,880 380,980 560,935 C760,890 900,960 1024,915 L1024,1024 L0,1024 Z" fill="#353535" opacity="0.55"/>
+  <!-- top gloss -->
+  <rect width="1024" height="520" fill="url(#gloss)"/>
+
+  <!-- book shadow + glow -->
+  <ellipse cx="512" cy="790" rx="330" ry="44" fill="#2f2f2f" opacity="0.6" filter="url(#shadow)"/>
+  <path d="M512,340 C440,300 330,290 250,320 L250,700 C330,672 440,682 512,722 Z" fill="#c7c7c7" opacity="0.85" filter="url(#glow)"/>
+  <path d="M 512,340 C 584,300 694,290 774,320 L 774,700 C 694,672 584,682 512,722 Z" fill="#c7c7c7" opacity="0.85" filter="url(#glow)"/>
+
+  <!-- ribbon bookmark -->
+  <path d="M706,690 L706,812 L737,788 L768,812 L768,690 Z" fill="url(#ribbon)"/>
+
+  <!-- cover -->
+  <path d="M512,362 C432,318 318,306 226,342 L226,738 C318,704 432,714 512,758 Z" fill="url(#cover)"/>
+  <path d="M 512,362 C 592,318 706,306 798,342 L 798,738 C 706,704 592,714 512,758 Z" fill="url(#cover)"/>
+  <path d="M512,362 C432,318 318,306 226,342 L226,738 C318,704 432,714 512,758 Z" fill="none" stroke="#bababa" stroke-opacity="0.55" stroke-width="3"/>
+  <path d="M 512,362 C 592,318 706,306 798,342 L 798,738 C 706,704 592,714 512,758 Z" fill="none" stroke="#bababa" stroke-opacity="0.55" stroke-width="3"/>
+
+  <!-- pages -->
+  <path d="M512,340 C440,300 330,290 250,320 L250,700 C330,672 440,682 512,722 Z" fill="url(#page)"/>
+  <path d="M 512,340 C 584,300 694,290 774,320 L 774,700 C 694,672 584,682 512,722 Z" fill="url(#pageR)"/>
+  <path d="M250,720 C330,692 440,702 512,742" stroke="#d4d4d4" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M774,720 C694,692 584,702 512,742" stroke="#d4d4d4" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <rect x="452" y="318" width="120" height="420" fill="url(#spine)"/>
+
+  <!-- left page: entries -->
+  <path d="M285,372 Q375,346 440,370" stroke="#838383" stroke-width="16" stroke-linecap="round" fill="none"/><path d="M285,416 Q377.5,390 470,424" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.89"/><path d="M285,460 Q357.5,434 430,468" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.83"/><path d="M285,504 Q377.5,478 470,512" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.77"/><path d="M285,548 Q377.5,522 470,556" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.71"/><path d="M285,592 Q357.5,566 430,600" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.65"/><path d="M285,636 Q377.5,610 470,644" stroke="#b1b1b1" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.59"/>
+
+  <!-- right page: glowing letter A -->
+  <path d="M580,650 L648,428 L716,650 M602,578 L694,578" stroke="#a8a8a8" stroke-width="52" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9" filter="url(#glowSm)"/>
+  <path d="M580,650 L648,428 L716,650 M602,578 L694,578" stroke="url(#letter)" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M648,438 L598,580" stroke="#fff" stroke-opacity="0.35" stroke-width="7" stroke-linecap="round" fill="none"/>
+
+  <!-- sparkles -->
+  <g filter="url(#glowSm)" opacity="0.9"><path d="M810,204 Q810,250 856,250 Q810,250 810,296 Q810,250 764,250 Q810,250 810,204 Z" fill="#fff"/><path d="M236,206 Q236,232 262,232 Q236,232 236,258 Q236,232 210,232 Q236,232 236,206 Z" fill="#fff"/></g>
+  <path d="M810,204 Q810,250 856,250 Q810,250 810,296 Q810,250 764,250 Q810,250 810,204 Z" fill="#fff"/><path d="M236,206 Q236,232 262,232 Q236,232 236,258 Q236,232 210,232 Q236,232 236,206 Z" fill="#fff"/><path d="M868,320 Q868,336 884,336 Q868,336 868,352 Q868,336 852,336 Q868,336 868,320 Z" fill="#fff"/>
+</g>
+<rect width="1024" height="1024" rx="230" fill="none" stroke="#dcdcdc" stroke-opacity="0.35" stroke-width="4"/>
+</svg>

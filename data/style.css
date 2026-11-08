@@ -1,0 +1,2262 @@
+/* =========================================================================
+ *  PAVUCONTROL — OBSIDIAN LUXURY  ·  v3
+ *  Black + Champagne Gold  ·  GTK4
+ *
+ *  Target : gtk4 4.22.x
+ *  Install: ~/.config/gtk-4.0/gtk.css
+ *
+ *  Design rules
+ *   · Only the WINDOW paints the 95 % background. Every container is
+ *     transparent, so translucency never stacks.
+ *   · Text colour is set on the window and INHERITED. Widgets only change
+ *     `color` on their own node.
+ *   · Warm palette only — no blue, cyan or cool grey anywhere.
+ *
+ *  Cascade rules (why v3 exists)
+ *   · This file is a USER-priority provider, so it beats the theme no matter
+ *     what the theme's specificity is. The only fights left are INSIDE this
+ *     file, so the order is always:
+ *         base  →  :hover  →  :active  →  :checked  →  :checked:hover
+ *         →  :disabled  →  variants (.flat / .suggested-action / …)
+ *         →  focus ring  →  backdrop
+ *   · Generic state rules deliberately do NOT use :not(:disabled).
+ *     That pseudo-class adds specificity and made generic hover rules beat
+ *     every scoped variant (window controls, spin buttons, tab close
+ *     buttons, suggested/destructive text colour).
+ *   · Any widget that clears `background-image` in its normal state also
+ *     clears it in :hover / :active, otherwise the generic button gradient
+ *     reappears on top of its own hover colour.
+ * ========================================================================= */
+
+
+/* =========================================================================
+ *  PALETTE
+ * ========================================================================= */
+
+@define-color obsidian     #080808;
+@define-color surface_1    #12100e;
+@define-color surface_2    #1a1713;
+@define-color surface_3    #24201a;
+
+@define-color line_soft    #26221c;
+@define-color line         #332d24;
+@define-color line_strong  #4a4030;
+
+@define-color gold_deep    #806b4d;
+@define-color gold         #b99869;
+@define-color gold_bright  #d2b88f;
+@define-color gold_pale    #e2cbaa;
+
+@define-color ink          #f3eee3;
+@define-color ink_soft     #d9d1c2;
+@define-color ink_dim      #8f887b;
+@define-color ink_faint    #5f5a51;
+@define-color on_gold      #16110a;
+
+@define-color ember        #d9826a;   /* warm red   — errors / destructive */
+@define-color amber        #e0b05a;   /* warm amber — warnings             */
+@define-color olive        #a9b565;   /* warm green — success              */
+
+
+/* =========================================================================
+ *  NAMED-COLOUR OVERRIDES
+ *  GTK's built-in Adwaita (and libadwaita apps) read these names. Redefining
+ *  them keeps the theme's own blue accent from leaking into any widget this
+ *  file does not style explicitly (calendar, colour chooser, selection
+ *  handles, focus rings, progress fills, …).
+ * ========================================================================= */
+
+/* Accent family */
+@define-color accent_color            #d2b88f;
+@define-color accent_bg_color         #b99869;
+@define-color accent_fg_color         #16110a;
+@define-color destructive_color       #d9826a;
+@define-color destructive_bg_color    #8a4a3a;
+@define-color destructive_fg_color    #ffe9e2;
+@define-color success_color           #a9b565;
+@define-color success_bg_color        #6b7440;
+@define-color success_fg_color        #16110a;
+@define-color warning_color           #e0b05a;
+@define-color warning_bg_color        #8a6a2a;
+@define-color warning_fg_color        #16110a;
+@define-color error_color             #d9826a;
+@define-color error_bg_color          #8a4a3a;
+@define-color error_fg_color          #ffe9e2;
+
+/* Surfaces */
+@define-color window_bg_color         #080808;
+@define-color window_fg_color         #f3eee3;
+@define-color view_bg_color           #12100e;
+@define-color view_fg_color           #f3eee3;
+@define-color headerbar_bg_color      #050505;
+@define-color headerbar_fg_color      #f3eee3;
+@define-color headerbar_border_color  #332d24;
+@define-color headerbar_backdrop_color #070707;
+@define-color headerbar_shade_color   rgba(0, 0, 0, 0.45);
+@define-color card_bg_color           #14120f;
+@define-color card_fg_color           #f3eee3;
+@define-color card_shade_color        rgba(0, 0, 0, 0.35);
+@define-color dialog_bg_color         #0a0a09;
+@define-color dialog_fg_color         #f3eee3;
+@define-color popover_bg_color        #10100f;
+@define-color popover_fg_color        #f3eee3;
+@define-color popover_shade_color     rgba(0, 0, 0, 0.45);
+@define-color shade_color             rgba(0, 0, 0, 0.45);
+@define-color scrollbar_outline_color #332d24;
+@define-color sidebar_bg_color        #10100f;
+@define-color sidebar_fg_color        #d9d1c2;
+@define-color sidebar_backdrop_color  #0c0c0b;
+@define-color sidebar_border_color    #332d24;
+@define-color sidebar_shade_color     rgba(0, 0, 0, 0.45);
+@define-color secondary_sidebar_bg_color        #12100e;
+@define-color secondary_sidebar_fg_color        #d9d1c2;
+@define-color secondary_sidebar_backdrop_color  #0e0d0c;
+@define-color secondary_sidebar_border_color    #332d24;
+@define-color secondary_sidebar_shade_color     rgba(0, 0, 0, 0.45);
+@define-color thumbnail_bg_color      #12100e;
+@define-color thumbnail_fg_color      #d9d1c2;
+@define-color overview_bg_color       #0f0f0f;
+@define-color overview_fg_color       #f3eee3;
+@define-color active_toggle_bg_color  #3a2e1b;
+@define-color active_toggle_fg_color  #f3eee3;
+
+/* Classic GTK theme names (GTK's bundled Adwaita still references these) */
+@define-color theme_bg_color                 #080808;
+@define-color theme_fg_color                 #f3eee3;
+@define-color theme_base_color               #12100e;
+@define-color theme_text_color               #f3eee3;
+@define-color theme_selected_bg_color        #b99869;
+@define-color theme_selected_fg_color        #16110a;
+@define-color theme_unfocused_bg_color       #080808;
+@define-color theme_unfocused_fg_color       #8f887b;
+@define-color theme_unfocused_base_color     #12100e;
+@define-color theme_unfocused_text_color     #8f887b;
+@define-color theme_unfocused_selected_bg_color #806b4d;
+@define-color theme_unfocused_selected_fg_color #16110a;
+@define-color insensitive_bg_color           #0f0f0f;
+@define-color insensitive_fg_color           #5f5a51;
+@define-color insensitive_base_color         #0f0f0f;
+@define-color borders                        #332d24;
+@define-color unfocused_borders              #26221c;
+@define-color content_view_bg                #12100e;
+@define-color text_view_bg                   #12100e;
+
+
+/* =========================================================================
+ *  GLOBAL CSS VARIABLES (GTK 4.16+ / libadwaita 1.6+)
+ *  Same values as the named colours above, for apps that read `var(--…)`.
+ * ========================================================================= */
+
+* {
+    /* Accent family */
+    --accent-color: #d2b88f;
+    --accent-bg-color: #b99869;
+    --accent-fg-color: #16110a;
+    --destructive-color: #d9826a;
+    --destructive-bg-color: #8a4a3a;
+    --destructive-fg-color: #ffe9e2;
+    --success-color: #a9b565;
+    --success-bg-color: #6b7440;
+    --success-fg-color: #16110a;
+    --warning-color: #e0b05a;
+    --warning-bg-color: #8a6a2a;
+    --warning-fg-color: #16110a;
+    --error-color: #d9826a;
+    --error-bg-color: #8a4a3a;
+    --error-fg-color: #ffe9e2;
+
+    /* Core surfaces */
+    --window-bg-color: #080808;
+    --view-bg-color: #12100e;
+    --dialog-bg-color: #0a0a09;
+    --popover-bg-color: #10100f;
+    --card-bg-color: #14120f;
+
+    /* Header / sidebar */
+    --headerbar-bg-color: #050505;
+    --headerbar-backdrop-color: #070707;
+    --sidebar-bg-color: #10100f;
+    --sidebar-backdrop-color: #0c0c0b;
+    --secondary-sidebar-bg-color: #12100e;
+    --secondary-sidebar-backdrop-color: #0e0d0c;
+
+    /* Other surfaces */
+    --thumbnail-bg-color: #12100e;
+    --overview-bg-color: #0f0f0f;
+    --active-toggle-bg-color: #3a2e1b;
+    --active-toggle-fg-color: #f3eee3;
+
+    /* Foreground */
+    --window-fg-color: #f3eee3;
+    --view-fg-color: #f3eee3;
+    --dialog-fg-color: #f3eee3;
+    --popover-fg-color: #f3eee3;
+    --card-fg-color: #f3eee3;
+    --sidebar-fg-color: #d9d1c2;
+    --secondary-sidebar-fg-color: #d9d1c2;
+    --headerbar-fg-color: #f3eee3;
+    --thumbnail-fg-color: #d9d1c2;
+    --overview-fg-color: #f3eee3;
+
+    /* Borders / shading */
+    --headerbar-border-color: #332d24;
+    --sidebar-border-color: #332d24;
+    --secondary-sidebar-border-color: #332d24;
+    --scrollbar-outline-color: #332d24;
+    --shade-color: rgba(0, 0, 0, 0.45);
+    --headerbar-shade-color: rgba(0, 0, 0, 0.45);
+    --popover-shade-color: rgba(0, 0, 0, 0.45);
+    --card-shade-color: rgba(0, 0, 0, 0.35);
+    --sidebar-shade-color: rgba(0, 0, 0, 0.45);
+    --secondary-sidebar-shade-color: rgba(0, 0, 0, 0.45);
+}
+
+
+/* =========================================================================
+ *  BASE
+ * ========================================================================= */
+
+/* Default: no focus ring on anything. Real controls opt back in inside the
+ * FOCUS RING section near the end of this file. Never ring containers,
+ * labels, rows or icons — GTK can move focus during copy/navigation and a
+ * global ring makes unrelated widgets flash at once. */
+*:focus-visible {
+    outline: none;
+}
+
+/* Text selection */
+selection,
+text selection,
+label selection {
+    background-color: rgba(185, 152, 105, 0.38);
+    color: #fff9ed;
+}
+
+/* Caret */
+text,
+textview text {
+    caret-color: @gold_bright;
+}
+
+/* Links */
+link,
+*:link {
+    color: @gold_bright;
+}
+link:hover,
+*:link:hover {
+    color: @gold_pale;
+}
+*:visited {
+    color: @gold;
+}
+
+/* Semantic colours (warm) */
+.error   { color: @ember; }
+.warning { color: @amber; }
+.success { color: @olive; }
+
+/* Interaction baseline: no theme shadows leaking onto text / icons */
+button,
+entry,
+spinbutton,
+dropdown,
+checkbutton,
+switch,
+scale,
+list,
+listview,
+columnview,
+popover {
+    text-shadow: none;
+    -gtk-icon-shadow: none;
+}
+
+
+/* =========================================================================
+ *  WINDOW
+ * ========================================================================= */
+
+window,
+window.background {
+    background-color: rgba(8, 8, 8, 0.95);
+    color: @ink;
+}
+
+/* Client-side decorated windows: soft depth + hairline gold edge. */
+window.csd {
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.70),
+                0 0 0 1px rgba(185, 152, 105, 0.22);
+}
+
+/* No compositor → no shadow, no rounded corners (they would show black). */
+window.solid-csd {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+window.maximized,
+window.fullscreen {
+    border-radius: 0;
+    box-shadow: none;
+}
+
+window.tiled,
+window.tiled-top,
+window.tiled-bottom,
+window.tiled-left,
+window.tiled-right {
+    border-radius: 0;
+    box-shadow: 0 0 0 1px rgba(185, 152, 105, 0.22);
+}
+
+/* Titlebar follows the window's rounded top corners so it never pokes out. */
+window.csd:not(.maximized):not(.fullscreen):not(.tiled) > headerbar.titlebar {
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+}
+
+
+/* =========================================================================
+ *  TRANSPARENT CONTAINERS
+ *  (never paint these — see design rules at top)
+ * ========================================================================= */
+
+box,
+grid,
+stack,
+overlay,
+revealer,
+viewport,
+scrolledwindow,
+paned,
+notebook > stack,
+.view,
+list,
+listview,
+columnview,
+iconview,
+treeview.view {
+    background-color: transparent;
+}
+
+
+/* =========================================================================
+ *  HEADER BAR  (only shows if the app uses client-side decorations)
+ * ========================================================================= */
+
+headerbar {
+    background-color: rgba(5, 5, 5, 0.96);
+    border: none;
+    border-bottom: 1px solid @line;
+}
+
+headerbar:backdrop {
+    background-color: rgba(7, 7, 7, 0.96);
+}
+
+headerbar .title,
+headerbar title,
+headerbar label.title {
+    color: @gold_pale;
+    font-weight: 600;
+}
+
+headerbar .subtitle {
+    color: @ink_dim;
+}
+
+headerbar:backdrop label {
+    color: @ink_dim;
+}
+
+/* Window controls: every state clears the generic button gradient/border. */
+windowcontrols button {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 999px;
+    box-shadow: none;
+    color: @ink_soft;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 3px;
+}
+
+windowcontrols button:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.16);
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+windowcontrols button:active {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.26);
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+windowcontrols button.close:hover {
+    background-color: rgba(217, 130, 106, 0.30);
+    color: #ffe9e2;
+}
+
+windowcontrols button.close:active {
+    background-color: rgba(217, 130, 106, 0.44);
+    color: #ffe9e2;
+}
+
+windowcontrols button:disabled {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    color: @ink_faint;
+}
+
+/* =========================================================================
+ *  HEADERBAR ICON BUTTONS — force flat even without .flat class
+ *  (fixes the boxy menu button vs. flat back/forward mismatch)
+ * ========================================================================= */
+
+headerbar button.circular,
+menubutton > button.toggle.circular {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: @ink_soft;
+}
+
+headerbar button.circular:hover,
+menubutton > button.toggle.circular:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.14);
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+headerbar button.circular:active,
+headerbar button.circular:checked,
+menubutton > button.toggle.circular:active,
+menubutton > button.toggle.circular:checked {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.24);
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+/* Equalize row height so stacked headerbars (title row + path-bar row) align */
+headerbar {
+    min-height: 46px;
+}
+
+/* =========================================================================
+ *  NAUTILUS SPLIT-VIEW HEADER ROWS — equalize sidebar vs content top-bar
+ *  (fixes the stepped/misaligned seam between the two panes' header rows)
+ * ========================================================================= */
+
+.sidebar-pane revealer.top-bar,
+.content-pane revealer.top-bar {
+    min-height: 46px;
+}
+
+/* Make sure the inner box actually fills that height instead of just
+ * centering a shorter natural size inside it. */
+.sidebar-pane revealer.top-bar > windowhandle > box,
+.content-pane revealer.top-bar > windowhandle > box {
+    min-height: 46px;
+}
+/* =========================================================================
+ *  NOTEBOOK / TABS
+ * ========================================================================= */
+
+notebook {
+    border-radius: 12px;
+}
+
+notebook > header {
+    background-color: rgba(5, 5, 5, 0.96);
+    padding: 0 6px;
+}
+
+notebook > header.top    { border-bottom: 1px solid @line; }
+notebook > header.bottom { border-top:    1px solid @line; }
+notebook > header.left   { border-right:  1px solid @line; }
+notebook > header.right  { border-left:   1px solid @line; }
+
+notebook > header > tabs > tab {
+    background-color: transparent;
+    color: #817b71;
+
+    border: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 8px 8px 0 0;
+
+    min-height: 22px;
+    margin: 0 2px;
+    padding: 9px 18px;
+
+    transition: all 180ms ease-out;
+}
+
+/* Side tabs: keep the accent line on the inner edge instead of the bottom. */
+notebook > header.left > tabs > tab,
+notebook > header.right > tabs > tab {
+    border-radius: 8px;
+}
+
+notebook > header > tabs > tab:hover {
+    background-image: linear-gradient(to top,
+                                      rgba(185, 152, 105, 0.09),
+                                      rgba(185, 152, 105, 0.00));
+    color: @ink_soft;
+}
+
+notebook > header > tabs > tab:checked {
+    background-image: linear-gradient(to top,
+                                      rgba(185, 152, 105, 0.18),
+                                      rgba(185, 152, 105, 0.00));
+    color: @gold_pale;
+    border-bottom-color: @gold;
+}
+
+notebook > header > tabs > tab:disabled {
+    background-image: none;
+    color: @ink_faint;
+}
+
+/* Tab close button */
+notebook > header > tabs > tab button {
+    min-width: 16px;
+    min-height: 16px;
+    padding: 2px;
+    border-radius: 999px;
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: inherit;
+}
+
+notebook > header > tabs > tab button:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.18);
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+notebook > header > tabs > tab button:active {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.28);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+
+/* =========================================================================
+ *  LABELS
+ *  No explicit colour on `label` — it must inherit from its parent.
+ * ========================================================================= */
+
+label:disabled,
+image:disabled {
+    color: @ink_faint;
+}
+
+.dim-label,
+label.dim-label {
+    color: @ink_dim;
+    opacity: 1;
+}
+
+.title-1, .title-2, .title-3, .title-4,
+.heading {
+    color: @ink;
+    font-weight: 700;
+}
+
+.caption,
+.caption-heading {
+    color: @ink_dim;
+}
+
+.numeric {
+    font-feature-settings: "tnum";
+}
+
+
+/* =========================================================================
+ *  BUTTONS
+ *  Plain buttons, toggle buttons (mute / lock), combo & dropdown triggers,
+ *  menu buttons.
+ * ========================================================================= */
+
+button {
+    background-image: linear-gradient(to bottom,
+                                      rgba(33, 30, 25, 0.96),
+                                      rgba(20, 18, 15, 0.96));
+    color: @ink;
+
+    border: 1px solid #302b23;
+    border-radius: 10px;
+
+    padding: 6px 12px;
+    min-height: 20px;
+    min-width: 16px;
+
+    box-shadow: inset 0 1px rgba(255, 244, 214, 0.05),
+                0 1px 2px rgba(0, 0, 0, 0.45);
+
+    transition: all 160ms ease-out;
+}
+
+button:hover {
+    background-image: linear-gradient(to bottom,
+                                      rgba(46, 41, 32, 0.98),
+                                      rgba(28, 25, 20, 0.98));
+    color: #fff9ed;
+    border-color: #9b7d38;
+
+    box-shadow: inset 0 1px rgba(255, 244, 214, 0.08),
+                0 0 12px rgba(185, 152, 105, 0.14);
+}
+
+button:active {
+    background-image: linear-gradient(to bottom,
+                                      rgba(34, 27, 14, 0.99),
+                                      rgba(52, 42, 21, 0.99));
+    color: #fff9ed;
+    border-color: #bfa47a;
+
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55);
+}
+
+/* Toggled on — mute, lock-channels, "set as default", open menu-button. */
+button:checked {
+    background-image: linear-gradient(to bottom,
+                                      rgba(78, 62, 26, 0.98),
+                                      rgba(46, 36, 16, 0.98));
+    color: @gold_bright;
+    border-color: #a68a61;
+
+    box-shadow: inset 0 1px rgba(255, 236, 170, 0.14),
+                0 0 10px rgba(185, 152, 105, 0.20);
+}
+
+button:checked:hover {
+    background-image: linear-gradient(to bottom,
+                                      rgba(92, 73, 30, 0.99),
+                                      rgba(56, 44, 19, 0.99));
+    color: @gold_pale;
+    border-color: #bfa47a;
+}
+
+/* Disabled wins over every state above, including checked. */
+button:disabled,
+button:checked:disabled,
+button:active:disabled {
+    background-image: none;
+    background-color: rgba(15, 15, 15, 0.95);
+    color: @ink_faint;
+    border-color: #1d1b18;
+    box-shadow: none;
+}
+
+/* ---- Flat / icon-only ---------------------------------------------------- */
+
+button.flat {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: @ink_soft;
+}
+
+button.flat:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.10);
+    border-color: rgba(185, 152, 105, 0.30);
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+button.flat:active,
+button.flat:checked {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.20);
+    border-color: rgba(185, 152, 105, 0.45);
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+button.flat:checked:hover {
+    background-color: rgba(185, 152, 105, 0.26);
+    color: @gold_pale;
+}
+
+button.flat:disabled,
+button.flat:checked:disabled {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: @ink_faint;
+}
+
+/* ---- Shapes -------------------------------------------------------------- */
+
+button.image-button,
+button.circular {
+    padding: 6px 8px;
+}
+
+button.circular {
+    border-radius: 999px;
+    min-width: 30px;
+    min-height: 30px;
+}
+
+button.pill {
+    border-radius: 999px;
+}
+
+/* Link buttons: look like links, not buttons. */
+button.link,
+button.link:hover,
+button.link:active,
+button.link:checked {
+    background-image: none;
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+button.link:hover {
+    color: @gold_pale;
+}
+
+/* ---- Primary action — filled champagne gold ------------------------------ */
+
+button.suggested-action {
+    background-image: linear-gradient(to bottom, #d2b88f, #a68a61);
+    color: @on_gold;
+    border-color: #bca074;
+    font-weight: 600;
+    box-shadow: inset 0 1px rgba(255, 250, 225, 0.45),
+                0 2px 10px rgba(185, 152, 105, 0.25);
+}
+
+button.suggested-action:hover {
+    background-image: linear-gradient(to bottom, #f0d886, #b79a70);
+    color: @on_gold;
+    border-color: #bca074;
+    box-shadow: inset 0 1px rgba(255, 250, 225, 0.55),
+                0 2px 16px rgba(210, 184, 143, 0.38);
+}
+
+button.suggested-action:active,
+button.suggested-action:checked {
+    background-image: linear-gradient(to bottom, #a68a61, #9b7d38);
+    color: @on_gold;
+    border-color: #bca074;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+button.suggested-action:disabled,
+button.suggested-action:checked:disabled {
+    background-image: none;
+    background-color: #3a3222;
+    color: @ink_faint;
+    border-color: #2c261b;
+    box-shadow: none;
+}
+
+/* ---- Destructive — muted ember ------------------------------------------- */
+
+button.destructive-action {
+    background-image: linear-gradient(to bottom, #8a4a3a, #6a3428);
+    color: #ffe9e2;
+    border-color: #a9604c;
+}
+
+button.destructive-action:hover {
+    background-image: linear-gradient(to bottom, #a5583f, #7d3c2c);
+    color: #ffe9e2;
+    border-color: @ember;
+}
+
+button.destructive-action:active,
+button.destructive-action:checked {
+    background-image: linear-gradient(to bottom, #6a3428, #5a2c22);
+    color: #ffe9e2;
+    border-color: @ember;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45);
+}
+
+button.destructive-action:disabled,
+button.destructive-action:checked:disabled {
+    background-image: none;
+    background-color: #2e1f1b;
+    color: #80635a;
+    border-color: #3a2822;
+    box-shadow: none;
+}
+
+/* ---- Linked button groups: square inner corners, share one border -------- */
+
+.linked:not(.vertical) > button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+.linked:not(.vertical) > button:first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.linked:not(.vertical) > button:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left-width: 0;
+}
+.linked:not(.vertical) > button:not(:first-child):not(:last-child) {
+    border-left-width: 0;
+}
+.linked.vertical > button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+.linked.vertical > button:first-child:not(:last-child) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.linked.vertical > button:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top-width: 0;
+}
+
+/* Entries and drop-downs sitting inside a linked group */
+.linked:not(.vertical) > entry:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+.linked:not(.vertical) > entry:first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.linked:not(.vertical) > entry:last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+
+/* =========================================================================
+ *  ENTRY / SEARCH / SPIN
+ *  GTK4 puts keyboard focus on the inner `text` node, so the outer `entry`
+ *  reacts with :focus-within (NOT :focus).
+ * ========================================================================= */
+
+entry,
+spinbutton {
+    background-color: rgba(18, 18, 18, 0.95);
+    color: @ink;
+    caret-color: @gold_bright;
+
+    border: 1px solid #302c25;
+    border-radius: 9px;
+
+    padding: 6px 9px;
+    min-height: 20px;
+
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.55);
+    transition: all 160ms ease-out;
+}
+
+entry:hover,
+spinbutton:hover {
+    border-color: #5a4a29;
+}
+
+entry:focus-within,
+spinbutton:focus-within {
+    background-color: rgba(22, 21, 18, 0.98);
+    color: #fffaf0;
+    border-color: #a68a61;
+
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45),
+                0 0 0 3px rgba(185, 152, 105, 0.16);
+}
+
+entry:disabled,
+spinbutton:disabled {
+    background-color: rgba(14, 14, 14, 0.95);
+    color: @ink_faint;
+    border-color: #1d1b18;
+    box-shadow: none;
+}
+
+entry.error,
+spinbutton.error {
+    border-color: @ember;
+}
+
+entry.warning,
+spinbutton.warning {
+    border-color: @amber;
+}
+
+entry.success,
+spinbutton.success {
+    border-color: @olive;
+}
+
+entry text placeholder,
+text placeholder {
+    color: @ink_faint;
+    opacity: 1;
+}
+
+/* Icons inside entries (search glyph, clear button, …) */
+entry image {
+    color: @ink_dim;
+}
+
+entry image:hover {
+    color: @gold_bright;
+}
+
+entry image:active {
+    color: @gold_pale;
+}
+
+entry image:disabled {
+    color: @ink_faint;
+}
+
+/* Spin button: inner text + up/down buttons.
+ * Buttons clear the generic gradient in every state. */
+spinbutton {
+    padding: 0;
+}
+
+spinbutton > text {
+    padding: 6px 9px;
+}
+
+spinbutton > button {
+    background-image: none;
+    background-color: transparent;
+    border: none;
+    border-left: 1px solid @line;
+    border-radius: 0;
+    box-shadow: none;
+    color: @ink_dim;
+    min-width: 26px;
+}
+
+spinbutton > button:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.14);
+    border-color: @line;
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+spinbutton > button:active {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.22);
+    border-color: @line;
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+spinbutton > button:disabled {
+    background-image: none;
+    background-color: transparent;
+    border-color: @line_soft;
+    color: @ink_faint;
+}
+
+spinbutton > button:last-child {
+    border-radius: 0 9px 9px 0;
+}
+
+textview text {
+    background-color: rgba(18, 18, 18, 0.95);
+    color: @ink;
+    caret-color: @gold_bright;
+}
+
+
+/* =========================================================================
+ *  SCALES — VOLUME SLIDERS
+ * ========================================================================= */
+
+scale trough {
+    background-color: #201d18;
+    border: 1px solid #302c25;
+    border-radius: 999px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.65);
+}
+
+scale.horizontal trough {
+    min-height: 6px;
+}
+
+scale.vertical trough {
+    min-width: 6px;
+}
+
+/* Filled portion — deep gold to champagne */
+scale highlight {
+    background-image: linear-gradient(to right, #806b4d, #b99869 55%, #d2b88f);
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 0 10px rgba(185, 152, 105, 0.32);
+}
+
+scale.vertical highlight {
+    background-image: linear-gradient(to top, #806b4d, #b99869 55%, #d2b88f);
+}
+
+scale fill {
+    background-color: rgba(185, 152, 105, 0.20);
+    border-radius: 999px;
+}
+
+/* Knob */
+scale slider {
+    background-image: linear-gradient(to bottom, #dfc79f, #b99869);
+    border: 1px solid #776347;
+    border-radius: 999px;
+
+    min-width: 18px;
+    min-height: 18px;
+
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.65),
+                inset 0 1px rgba(255, 252, 232, 0.65);
+
+    transition: all 140ms ease-out;
+}
+
+scale.horizontal slider {
+    margin: -7px 0;
+}
+
+scale.vertical slider {
+    margin: 0 -7px;
+}
+
+scale slider:hover {
+    background-image: linear-gradient(to bottom, #e5cfaa, #c3a77a);
+    border-color: #c3a14a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.65),
+                0 0 0 5px rgba(185, 152, 105, 0.18),
+                inset 0 1px rgba(255, 252, 232, 0.75);
+}
+
+scale slider:active {
+    background-image: linear-gradient(to bottom, #d8c09a, #a68a61);
+    border-color: #bfa47a;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7),
+                0 0 0 8px rgba(185, 152, 105, 0.22);
+}
+
+/* Disabled / insensitive (e.g. locked device).
+ * Written as `scale:disabled <child>` — the state lives on the scale node. */
+scale:disabled trough {
+    background-color: #191713;
+    border-color: #22201b;
+}
+
+scale:disabled highlight {
+    background-image: none;
+    background-color: #4a4030;
+    box-shadow: none;
+}
+
+scale:disabled fill {
+    background-color: rgba(74, 64, 48, 0.30);
+}
+
+scale:disabled slider {
+    background-image: none;
+    background-color: #4a463d;
+    border-color: #2c2924;
+    box-shadow: none;
+}
+
+/* Tick marks (e.g. the 100 % / 0 dB mark on pavucontrol sliders) */
+scale marks indicator,
+scale mark indicator {
+    background-color: rgba(185, 152, 105, 0.50);
+    color: rgba(185, 152, 105, 0.50);
+}
+
+scale marks label,
+scale mark label {
+    color: @ink_dim;
+    font-size: 0.82em;
+}
+
+/* Numeric value bubble when draw-value is on */
+scale value {
+    color: @gold_bright;
+    font-weight: 600;
+}
+
+scale:disabled value {
+    color: @ink_faint;
+}
+
+
+/* =========================================================================
+ *  PROGRESS BAR  (pavucontrol's live peak / VU meter)
+ * ========================================================================= */
+
+progressbar trough {
+    background-color: #1c1a16;
+    border: 1px solid #292520;
+    border-radius: 999px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+progressbar.horizontal trough,
+progressbar.horizontal progress {
+    min-height: 6px;
+}
+
+progressbar.vertical trough,
+progressbar.vertical progress {
+    min-width: 6px;
+}
+
+progressbar progress {
+    background-image: linear-gradient(to right, #7c6229, #b99869 60%, #d8c09a);
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 0 8px rgba(210, 184, 143, 0.45);
+}
+
+progressbar.vertical progress {
+    background-image: linear-gradient(to top, #7c6229, #b99869 60%, #d8c09a);
+}
+
+progressbar:disabled progress {
+    background-image: none;
+    background-color: #4a4030;
+    box-shadow: none;
+}
+
+progressbar text {
+    color: @ink_soft;
+    font-size: 0.85em;
+}
+
+
+/* =========================================================================
+ *  LEVEL BAR
+ * ========================================================================= */
+
+levelbar trough {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
+levelbar block {
+    min-width: 8px;
+    min-height: 6px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+}
+
+levelbar block.empty {
+    background-color: #1c1a16;
+    border-color: #292520;
+}
+
+levelbar block.filled {
+    background-image: linear-gradient(to bottom, #d2b88f, #a68a61);
+    border-color: #776347;
+}
+
+levelbar block.filled.high {
+    background-image: linear-gradient(to bottom, #d8c09a, #bfa47a);
+}
+
+levelbar block.filled.full {
+    background-image: linear-gradient(to bottom, #d9826a, #b5604a);
+    border-color: #96503c;
+}
+
+
+/* =========================================================================
+ *  SWITCH
+ * ========================================================================= */
+
+switch {
+    background-color: #25231f;
+    border: 1px solid #37332b;
+    border-radius: 999px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+
+    min-width: 48px;
+    min-height: 26px;
+
+    transition: all 200ms ease-out;
+}
+
+switch:hover {
+    border-color: #6a5630;
+}
+
+switch:active {
+    border-color: @gold;
+}
+
+switch:checked {
+    background-image: linear-gradient(to right, #806b4d, #b99869);
+    border-color: #bfa47a;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35),
+                0 0 12px rgba(185, 152, 105, 0.28);
+}
+
+switch:checked:hover {
+    border-color: #d2b88f;
+}
+
+switch slider {
+    background-color: #dcd6ca;
+    border: none;
+    border-radius: 999px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+    min-width: 20px;
+    min-height: 20px;
+    margin: 2px;
+}
+
+switch:checked slider {
+    background-color: #fffbed;
+}
+
+/* Disabled — including disabled+checked, which must drop the gold gradient. */
+switch:disabled,
+switch:checked:disabled {
+    background-image: none;
+    background-color: #1a1815;
+    border-color: #24211c;
+    box-shadow: none;
+}
+
+switch:checked:disabled {
+    background-color: #3a3222;
+}
+
+switch:disabled slider,
+switch:checked:disabled slider {
+    background-color: #4a463d;
+    box-shadow: none;
+}
+
+/* Optional on/off text inside the switch */
+switch label {
+    color: @ink_dim;
+    font-size: 0.75em;
+}
+switch:checked label {
+    color: @on_gold;
+}
+switch:disabled label {
+    color: @ink_faint;
+}
+
+
+/* =========================================================================
+ *  CHECK BOXES & RADIO BUTTONS
+ * ========================================================================= */
+
+checkbutton {
+    color: #eee8dc;
+}
+
+checkbutton:disabled {
+    color: @ink_faint;
+}
+
+check,
+radio {
+    background-color: #151515;
+    background-image: none;
+    color: @on_gold;
+
+    border: 1px solid #4a4238;
+    border-radius: 6px;
+
+    min-width: 18px;
+    min-height: 18px;
+
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    transition: all 140ms ease-out;
+}
+
+radio {
+    border-radius: 999px;
+}
+
+check:hover,
+radio:hover {
+    border-color: #a0803a;
+}
+
+check:active,
+radio:active {
+    border-color: @gold;
+}
+
+check:checked,
+check:indeterminate,
+radio:checked,
+radio:indeterminate {
+    background-image: linear-gradient(to bottom, #d2b88f, #a68a61);
+    border-color: #d2b05a;
+    color: @on_gold;
+    box-shadow: 0 0 10px rgba(185, 152, 105, 0.30);
+}
+
+check:disabled,
+radio:disabled {
+    background-color: #111111;
+    border-color: #26231e;
+    color: @ink_faint;
+    box-shadow: none;
+}
+
+check:checked:disabled,
+check:indeterminate:disabled,
+radio:checked:disabled,
+radio:indeterminate:disabled {
+    background-image: none;
+    background-color: #4a4030;
+    border-color: #3a3226;
+    color: #8f887b;
+}
+
+
+/* =========================================================================
+ *  LISTS / ROWS / TREE VIEWS
+ *  Order inside this block matters: base → hover → active → selected.
+ * ========================================================================= */
+
+row {
+    color: #eee8dc;
+    border-radius: 8px;
+    transition: all 140ms ease-out;
+}
+
+row.activatable {
+    color: @ink_soft;
+}
+
+row:hover {
+    background-color: rgba(185, 152, 105, 0.08);
+}
+
+row.activatable:hover {
+    color: @ink;
+}
+
+row:active {
+    background-color: rgba(185, 152, 105, 0.14);
+}
+
+row.activatable:active {
+    color: @gold_pale;
+}
+
+row:selected,
+row:selected:hover,
+row:selected:active,
+row.activatable:selected,
+row.activatable:selected:hover,
+row.activatable:selected:active {
+    background-color: rgba(185, 152, 105, 0.16);
+    color: @gold_pale;
+    box-shadow: inset 3px 0 0 @gold;
+}
+
+row:disabled,
+row.activatable:disabled {
+    color: @ink_faint;
+    background-color: transparent;
+}
+
+/* Boxed / card style lists */
+list.boxed-list,
+list.rich-list,
+.card {
+    background-color: rgba(20, 18, 15, 0.85);
+    color: @ink;
+    border: 1px solid @line;
+    border-radius: 12px;
+}
+
+list.boxed-list > row {
+    border-radius: 0;
+    border-bottom: 1px solid @line_soft;
+}
+
+list.boxed-list > row:last-child {
+    border-bottom: none;
+    border-radius: 0 0 11px 11px;
+}
+
+list.boxed-list > row:first-child {
+    border-radius: 11px 11px 0 0;
+}
+
+list.boxed-list > row:only-child {
+    border-radius: 11px;
+}
+
+/* A .card that is itself a button keeps button states, gold on hover. */
+button.card:hover {
+    color: @gold_pale;
+}
+button.card:active {
+    color: @gold_bright;
+}
+
+/* Tree views */
+treeview.view,
+.view {
+    color: #eee8dc;
+}
+
+treeview.view:hover {
+    background-color: rgba(185, 152, 105, 0.08);
+}
+
+treeview.view:selected,
+treeview.view:selected:hover,
+treeview.view:selected:focus,
+.view:selected {
+    background-color: rgba(185, 152, 105, 0.18);
+    color: @gold_pale;
+}
+
+treeview.view:disabled {
+    color: @ink_faint;
+}
+
+treeview.view header button {
+    background-image: none;
+    background-color: rgba(14, 13, 11, 0.95);
+    border: none;
+    border-bottom: 1px solid @line;
+    border-radius: 0;
+    color: @ink_dim;
+    box-shadow: none;
+}
+
+treeview.view header button:hover {
+    background-image: none;
+    background-color: rgba(26, 23, 19, 0.95);
+    color: @gold_pale;
+    box-shadow: none;
+}
+
+treeview.view header button:active {
+    background-image: none;
+    background-color: rgba(36, 32, 26, 0.95);
+    color: @gold_bright;
+    box-shadow: none;
+}
+
+/* Sidebars (file chooser, libadwaita-style navigation) */
+.navigation-sidebar {
+    background-color: #10100f;
+    color: @ink_soft;
+}
+
+.navigation-sidebar row,
+.navigation-sidebar > row {
+    background-color: transparent;
+    color: @ink_soft;
+}
+
+.navigation-sidebar row:hover,
+.navigation-sidebar > row:hover {
+    background-color: rgba(185, 152, 105, 0.10);
+    color: @ink;
+}
+
+.navigation-sidebar row:active,
+.navigation-sidebar > row:active {
+    background-color: rgba(185, 152, 105, 0.14);
+    color: @gold_pale;
+}
+
+.navigation-sidebar row:selected,
+.navigation-sidebar row:selected:hover,
+.navigation-sidebar row:selected:active,
+.navigation-sidebar > row:selected,
+.navigation-sidebar > row:selected:hover,
+.navigation-sidebar > row:selected:active {
+    background-color: rgba(185, 152, 105, 0.16);
+    color: @gold_pale;
+}
+
+.navigation-sidebar row:disabled,
+.navigation-sidebar > row:disabled {
+    color: @ink_faint;
+    background-color: transparent;
+}
+
+.navigation-sidebar row label,
+.navigation-sidebar row image {
+    color: inherit;
+}
+
+/* Icon view */
+iconview:selected,
+iconview:selected:hover {
+    background-color: rgba(185, 152, 105, 0.18);
+    color: @gold_pale;
+}
+
+
+/* =========================================================================
+ *  FRAMES
+ *  In GTK4 the border lives on the `frame` node itself.
+ * ========================================================================= */
+
+frame,
+.frame {
+    border: 1px solid #27241f;
+    border-radius: 10px;
+    background-color: transparent;
+}
+
+frame > label,
+frame > label.frame-label {
+    color: @ink_dim;
+    font-weight: 600;
+}
+
+
+/* =========================================================================
+ *  SCROLLBARS
+ * ========================================================================= */
+
+scrollbar {
+    background-color: rgba(8, 8, 8, 0.32);
+}
+
+scrollbar.vertical {
+    min-width: 9px;
+}
+
+scrollbar.horizontal {
+    min-height: 9px;
+}
+
+scrollbar trough {
+    background-color: rgba(18, 16, 14, 0.72);
+    border-radius: 999px;
+}
+
+scrollbar slider {
+    background-color: rgba(185, 152, 105, 0.48);
+    border: 1px solid rgba(210, 184, 143, 0.18);
+    border-radius: 999px;
+    min-width: 7px;
+    min-height: 36px;
+    transition: all 140ms ease-out;
+}
+
+scrollbar slider:hover {
+    background-color: rgba(185, 152, 105, 0.55);
+}
+
+scrollbar slider:active {
+    background-color: @gold;
+}
+
+scrollbar slider:disabled {
+    background-color: rgba(95, 90, 81, 0.24);
+}
+
+scrollbar.vertical slider {
+    min-height: 36px;
+}
+
+scrollbar.horizontal slider {
+    min-width: 36px;
+}
+
+scrollbar button {
+    background-image: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: @ink_dim;
+}
+
+scrollbar button:hover {
+    background-image: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: @gold_bright;
+}
+
+scrollbar button:active {
+    background-image: none;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: @gold_pale;
+}
+
+/* Result page: it can contain hundreds of timing rows. Keep its scroll
+ * surface dark and the content readable. */
+.result-scroll {
+    background-color: @obsidian;
+}
+
+.result-content {
+    color: @ink;
+    background-color: transparent;
+}
+
+
+/* =========================================================================
+ *  POPOVERS / DROPDOWNS / COMBO POPUPS / CONTEXT MENUS
+ *
+ *  GTK4 has no `menu` / `menuitem`. Everything is a popover:
+ *    popover.background > contents  … the visible surface
+ *    popover > arrow                … the little pointer
+ *    button.model                   … an item in a popover menu
+ *  (The GTK3 `modelbutton` node no longer exists, so it is not styled.)
+ * ========================================================================= */
+
+popover > contents {
+    background-color: rgba(16, 16, 15, 0.98);
+    color: #eee8dc;
+
+    border: 1px solid #3a3226;
+    border-radius: 12px;
+
+    padding: 4px;
+
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.70),
+                0 0 0 1px rgba(185, 152, 105, 0.08);
+}
+
+popover > arrow {
+    background-color: rgba(16, 16, 15, 0.98);
+    border: 1px solid #3a3226;
+}
+
+/* Items in a popover menu */
+popover.background.menu button.model {
+    background-image: none;
+    background-color: transparent;
+    color: @ink_soft;
+    border-color: transparent;
+    border-radius: 8px;
+    box-shadow: none;
+    transition: none;
+}
+
+popover.background.menu button.model:hover {
+    background-image: none;
+    background-color: rgba(185, 152, 105, 0.16);
+    color: @gold_pale;
+    border-color: rgba(128, 107, 77, 0.42);
+    box-shadow: none;
+}
+
+popover.background.menu button.model:active {
+    background-image: none;
+    background-color: rgba(71, 55, 27, 0.92);
+    color: #ffe39a;
+    border-color: rgba(166, 138, 97, 0.62);
+    box-shadow: none;
+}
+
+popover.background.menu button.model:checked {
+    background-image: none;
+    background-color: rgba(57, 46, 27, 0.90);
+    color: @gold_bright;
+    border-color: transparent;
+    box-shadow: none;
+}
+
+popover.background.menu button.model:disabled {
+    background-image: none;
+    background-color: transparent;
+    color: @ink_faint;
+    border-color: transparent;
+}
+
+/* Menu item content follows the item's colour */
+popover.background.menu button.model label,
+popover.background.menu button.model image {
+    color: inherit;
+}
+
+popover.background.menu button.model arrow,
+popover.background.menu button.model accelerator {
+    color: @ink_dim;
+}
+
+popover.background.menu button.model:hover arrow,
+popover.background.menu button.model:hover accelerator {
+    color: @gold_bright;
+}
+
+/* Lists inside popovers: GtkDropDown and GtkComboBox popups */
+popover listview,
+popover list,
+popover treeview.view,
+popover scrolledwindow {
+    background-color: transparent;
+}
+
+popover listview > row,
+popover list > row {
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+popover treeview.view:selected {
+    border-radius: 8px;
+}
+
+popover separator {
+    background-color: @line;
+    margin: 4px 6px;
+}
+
+/* Drop-down: popup list rows */
+dropdown popover.background > contents {
+    background-color: rgba(16, 16, 15, 0.98);
+    color: @ink;
+}
+
+dropdown popover.background listview > row {
+    color: @ink_soft;
+    background-color: transparent;
+}
+
+dropdown popover.background listview > row:hover {
+    background-color: rgba(185, 152, 105, 0.14);
+    color: @gold_pale;
+}
+
+dropdown popover.background listview > row:selected {
+    background-color: rgba(185, 152, 105, 0.18);
+    color: @gold_pale;
+}
+
+dropdown:disabled,
+combobox:disabled {
+    color: @ink_faint;
+}
+
+/* Menu-button arrows */
+menubutton > button.toggle arrow {
+    color: @ink_dim;
+}
+
+menubutton > button.toggle:hover arrow {
+    color: @gold_bright;
+}
+
+/* Entry / text context menus use the same popover look */
+entry popover.background.menu > contents,
+text popover.background.menu > contents,
+textview popover.background.menu > contents {
+    background-color: rgba(16, 16, 15, 0.98);
+    color: @ink;
+}
+
+
+/* =========================================================================
+ *  TOOLTIPS
+ * ========================================================================= */
+
+tooltip,
+tooltip.background {
+    background-color: rgba(19, 18, 15, 0.97);
+    color: #f4eee2;
+
+    border: 1px solid #3b3222;
+    border-radius: 8px;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
+}
+
+tooltip label {
+    color: #f4eee2;
+}
+
+
+/* =========================================================================
+ *  SEPARATORS / PANED
+ * ========================================================================= */
+
+separator {
+    background-color: #25231f;
+    min-width: 1px;
+    min-height: 1px;
+}
+
+paned > separator {
+    background-color: @line;
+}
+
+paned > separator:hover {
+    background-color: @gold_deep;
+}
+
+
+/* =========================================================================
+ *  INFO BARS
+ * ========================================================================= */
+
+infobar > revealer > box {
+    background-color: rgba(43, 35, 18, 0.98);
+    border-bottom: 1px solid #4a4030;
+    padding: 6px 10px;
+}
+
+infobar.info > revealer > box,
+infobar.question > revealer > box {
+    background-color: rgba(43, 35, 18, 0.98);
+    border-bottom-color: @gold_deep;
+}
+
+infobar.warning > revealer > box {
+    background-color: rgba(58, 44, 16, 0.98);
+    border-bottom-color: @amber;
+}
+
+infobar.error > revealer > box {
+    background-color: rgba(60, 28, 22, 0.98);
+    border-bottom-color: @ember;
+}
+
+
+/* =========================================================================
+ *  EXPANDER / ARROWS
+ * ========================================================================= */
+
+expander arrow,
+arrow {
+    color: @ink_dim;
+}
+
+expander:hover arrow,
+button:hover arrow {
+    color: @gold_bright;
+}
+
+
+/* =========================================================================
+ *  EXTRA WIDGETS — kept dark so nothing falls back to the light theme
+ * ========================================================================= */
+
+actionbar > revealer > box,
+searchbar > revealer > box {
+    background-color: rgba(5, 5, 5, 0.96);
+    border-top: 1px solid @line;
+}
+
+searchbar > revealer > box {
+    border-top: none;
+    border-bottom: 1px solid @line;
+}
+
+statusbar {
+    background-color: rgba(5, 5, 5, 0.96);
+    color: @ink_dim;
+}
+
+.osd,
+.app-notification {
+    background-color: rgba(10, 10, 9, 0.92);
+    color: @ink;
+}
+
+calendar {
+    background-color: transparent;
+    color: @ink;
+    border: 1px solid @line;
+    border-radius: 10px;
+    padding: 2px;
+}
+
+calendar > header {
+    border-bottom: 1px solid @line;
+}
+
+calendar > grid > label.day-name,
+calendar > grid > label.week-number {
+    color: @ink_dim;
+}
+
+calendar > grid > label.day-number {
+    color: @ink_soft;
+}
+
+calendar > grid > label.day-number.other-month {
+    color: @ink_faint;
+}
+
+calendar > grid > label.day-number.today {
+    box-shadow: inset 0 -2px @gold;
+}
+
+calendar > grid > label.day-number:selected {
+    background-color: rgba(185, 152, 105, 0.28);
+    color: @gold_pale;
+    border-radius: 6px;
+}
+
+
+/* =========================================================================
+ *  DIALOG SURFACES — KEEP GTK4 FILE / UTILITY DIALOGS DARK
+ *
+ *  Some GTK4 / portal dialogs put the visible surface on a nested node
+ *  rather than directly on window.dialog. The container rules above are
+ *  transparent on purpose, so dialogs get an opaque obsidian base here and
+ *  everything inside is transparent on top of it.
+ *
+ *  Note: buttons and entries are intentionally NOT restyled in this block.
+ *  The global rules already cover them, and a `window.dialog button` rule
+ *  would out-rank the generic :hover / :checked colours.
+ * ========================================================================= */
+
+window.dialog,
+window.messagedialog,
+window.aboutdialog,
+window.assistant,
+window.dialog.background,
+window.messagedialog.background,
+window.background.dialog,
+window.background.messagedialog {
+    background-color: @obsidian;
+    color: @ink;
+}
+
+/* Container nodes: transparent over the opaque base. */
+window.dialog box,
+window.messagedialog box,
+window.dialog grid,
+window.messagedialog grid,
+window.dialog frame,
+window.messagedialog frame,
+window.dialog viewport,
+window.messagedialog viewport,
+window.dialog scrolledwindow,
+window.messagedialog scrolledwindow,
+window.dialog stack,
+window.messagedialog stack,
+window.dialog overlay,
+window.messagedialog overlay,
+window.dialog revealer,
+window.messagedialog revealer,
+window.dialog list,
+window.messagedialog list,
+window.dialog listview,
+window.messagedialog listview,
+window.dialog columnview,
+window.messagedialog columnview,
+window.dialog .view,
+window.messagedialog .view,
+window.dialog .background,
+window.messagedialog .background,
+window.dialog .background > box,
+window.messagedialog .background > box,
+window.dialog .content-view,
+window.messagedialog .content-view,
+window.dialog .view.background,
+window.messagedialog .view.background {
+    background-color: transparent;
+    color: @ink;
+}
+
+/* File chooser surfaces (GTK and xdg-desktop-portal-gtk). */
+window.dialog filechooser,
+window.messagedialog filechooser,
+window.dialog filechooserwidget,
+window.messagedialog filechooserwidget,
+window.background.dialog filechooser,
+window.background.dialog filechooserwidget,
+filechooser,
+filechooserwidget {
+    background-color: @obsidian;
+    color: @ink;
+}
+
+/* Generic dialog nodes some GTK versions expose (the "New Folder" dialog). */
+window.dialog dialog,
+window.dialog dialog > box,
+window.dialog dialog box,
+window.messagedialog dialog,
+window.messagedialog dialog > box,
+window.messagedialog dialog box,
+window.dialog .dialog-vbox,
+window.dialog .dialog-content-area,
+window.dialog .dialog-action-area,
+window.dialog .content-area,
+window.dialog .action-area,
+window.messagedialog .dialog-vbox,
+window.messagedialog .dialog-content-area,
+window.messagedialog .dialog-action-area,
+window.messagedialog .content-area,
+window.messagedialog .action-area {
+    background-color: @obsidian;
+    color: @ink;
+}
+
+/* Cards and boxed lists keep their own surface inside dialogs
+ * (the transparent rules above would otherwise flatten them). */
+window.dialog list.boxed-list,
+window.messagedialog list.boxed-list,
+window.dialog .card,
+window.messagedialog .card {
+    background-color: rgba(20, 18, 15, 0.85);
+}
+
+/* The filechooser's own sidebar stays dark */
+window.dialog .navigation-sidebar,
+window.messagedialog .navigation-sidebar {
+    background-color: #10100f;
+}
+
+
+/* =========================================================================
+ *  FOCUS RING — soft gold, only on real controls
+ *
+ *  Thin outline + faint halo. Where a control already has a box-shadow
+ *  (buttons, knobs, switches), the focus rules repeat that shadow, so
+ *  keyboard focus never erases its inner highlight or hover glow.
+ *  Text fields use their gold border instead of a ring.
+ * ========================================================================= */
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+button:focus-visible {
+    outline: 1px solid rgba(185, 152, 105, 0.42);
+    outline-offset: 0;
+    box-shadow: inset 0 1px rgba(255, 244, 214, 0.05),
+                0 1px 2px rgba(0, 0, 0, 0.45),
+                0 0 0 2px rgba(185, 152, 105, 0.07),
+                0 0 9px rgba(185, 152, 105, 0.16);
+    transition: outline-color 180ms ease-out,
+                box-shadow 220ms ease-out;
+}
+
+button:focus-visible:hover {
+    box-shadow: inset 0 1px rgba(255, 244, 214, 0.08),
+                0 0 12px rgba(185, 152, 105, 0.14),
+                0 0 0 2px rgba(185, 152, 105, 0.07);
+}
+
+button:focus-visible:active {
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.55),
+                0 0 0 2px rgba(185, 152, 105, 0.07);
+}
+
+button:focus-visible:checked {
+    box-shadow: inset 0 1px rgba(255, 236, 170, 0.14),
+                0 0 10px rgba(185, 152, 105, 0.20),
+                0 0 0 2px rgba(185, 152, 105, 0.07);
+}
+
+button.flat:focus-visible,
+button.flat:focus-visible:hover,
+button.flat:focus-visible:active,
+button.flat:focus-visible:checked {
+    outline-color: rgba(185, 152, 105, 0.34);
+    box-shadow: 0 0 0 2px rgba(185, 152, 105, 0.05),
+                0 0 8px rgba(185, 152, 105, 0.12);
+}
+
+button.suggested-action:focus-visible,
+button.suggested-action:focus-visible:hover,
+button.suggested-action:focus-visible:active {
+    outline: 1px solid rgba(226, 203, 170, 0.62);
+    box-shadow: inset 0 1px rgba(255, 250, 225, 0.45),
+                0 0 0 2px rgba(185, 152, 105, 0.08),
+                0 0 10px rgba(185, 152, 105, 0.20);
+}
+
+button.destructive-action:focus-visible,
+button.destructive-action:focus-visible:hover,
+button.destructive-action:focus-visible:active {
+    outline: 1px solid rgba(217, 130, 106, 0.48);
+    box-shadow: 0 0 0 2px rgba(217, 130, 106, 0.06),
+                0 0 9px rgba(217, 130, 106, 0.14);
+}
+
+/* Header / window-control / menu-item buttons: outline only, no halo. */
+headerbar button:focus-visible,
+windowcontrols button:focus-visible,
+popover.background.menu button.model:focus-visible,
+spinbutton > button:focus-visible,
+scrollbar button:focus-visible,
+notebook > header > tabs > tab button:focus-visible {
+    outline: 1px solid rgba(185, 152, 105, 0.42);
+    outline-offset: 0;
+    box-shadow: none;
+}
+
+popover.background.menu button.model:focus-visible {
+    outline-color: rgba(210, 184, 143, 0.50);
+}
+
+/* ---- Controls with their own shadows: outline only ----------------------- */
+
+scale:focus-visible slider,
+scale slider:focus-visible,
+switch:focus-visible,
+checkbutton:focus-visible check,
+checkbutton:focus-visible radio,
+check:focus-visible,
+radio:focus-visible {
+    outline: 1px solid rgba(185, 152, 105, 0.48);
+    outline-offset: 0;
+}
+
+/* ---- Text inputs & structural nodes: never a ring ------------------------ */
+
+entry:focus-visible,
+spinbutton:focus-visible,
+dropdown:focus-visible,
+combobox:focus-visible,
+entry text:focus-visible,
+spinbutton text:focus-visible,
+textview text:focus-visible,
+label:focus-visible,
+text:focus-visible,
+textview:focus-visible,
+row:focus-visible,
+box:focus-visible,
+grid:focus-visible,
+viewport:focus-visible,
+scrolledwindow:focus-visible,
+image:focus-visible,
+listview:focus-visible,
+columnview:focus-visible,
+treeview:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+/* entry:focus-visible above must not erase the entry's own focus glow
+ * (which is on :focus-within, a different state) — restated for safety. */
+entry:focus-within,
+spinbutton:focus-within {
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45),
+                0 0 0 3px rgba(185, 152, 105, 0.16);
+}
+
+
+/* =========================================================================
+ *  DRAG & DROP TARGETS  (visual only)
+ *  Scoped to leaf widgets; a universal :drop(active) would tint whole
+ *  containers.
+ * ========================================================================= */
+
+row:drop(active),
+button:drop(active),
+entry:drop(active),
+listview:drop(active),
+list:drop(active),
+columnview:drop(active),
+.navigation-sidebar row:drop(active) {
+    background-color: rgba(185, 152, 105, 0.14);
+    color: @gold_pale;
+}
+
+.navigation-sidebar row:drop(active) {
+    background-color: rgba(185, 152, 105, 0.18);
+}
+
+
+/* =========================================================================
+ *  BACKDROP (window not focused)
+ *  Only dims plain controls; gold toggles, primary and destructive buttons
+ *  keep their own text colour so they stay readable.
+ * ========================================================================= */
+
+button:backdrop:not(.suggested-action):not(.destructive-action):not(:checked) {
+    color: @ink_dim;
+}
+
+entry:backdrop,
+spinbutton:backdrop,
+dropdown:backdrop {
+    color: @ink_dim;
+}
+
+
+/* =========================================================================
+ *  DICTIONARY ENTRY EXTRAS  (Krumeto: CEFR level, etymology)
+ * ========================================================================= */
+
+.cefr-badge {
+    color: @gold_bright;
+    background-color: alpha(@gold, 0.14);
+    border: 1px solid @gold_deep;
+    border-radius: 999px;
+    padding: 0 8px;
+    font-size: 0.8em;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.entry-expander > title {
+    color: @ink_dim;
+    font-size: 0.9em;
+}
+
+.meta-chip {
+    color: @ink_dim;
+    border: 1px solid @line;
+    border-radius: 999px;
+    padding: 0 8px;
+    font-size: 0.85em;
+}
+
+.sense-tags {
+    color: @gold_deep;
+    font-size: 0.85em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.parent-gloss {
+    color: @ink_dim;
+    font-size: 0.9em;
+}
+
+.usage-notes {
+    color: @ink_soft;
+    font-size: 0.95em;
+}
+
+.etymology-text {
+    color: @ink_soft;
+    font-style: italic;
+    font-size: 0.95em;
+}

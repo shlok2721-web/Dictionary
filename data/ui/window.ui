@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <requires lib="libadwaita" version="1.5"/>
+  <menu id="primary_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Random Word</attribute>
+        <attribute name="action">win.random-word</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Paste and Search</attribute>
+        <attribute name="action">win.paste-search</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="action">win.preferences</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">About Dictionary</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
+      </item>
+    </section>
+  </menu>
+  <template class="DictionaryWindow" parent="AdwApplicationWindow">
+    <property name="title" translatable="yes">Dictionary</property>
+    <property name="default-width">800</property>
+    <property name="default-height">600</property>
+    <property name="width-request">360</property>
+    <property name="height-request">294</property>
+    <child>
+      <object class="GtkEventControllerKey" id="key_ctrlr"/>
+    </child>
+    <child>
+      <object class="AdwBreakpoint">
+        <condition>max-width: 640sp</condition>
+        <setter object="main_split_view" property="collapsed">True</setter>
+      </object>
+    </child>
+    <property name="content">
+      <object class="AdwToastOverlay" id="toast_overlay">
+        <child>
+          <object class="AdwOverlaySplitView" id="main_split_view">
+            <property name="sidebar-width-fraction">0.3</property>
+            <property name="min-sidebar-width">240</property>
+            <property name="max-sidebar-width">360</property>
+            <property name="show-sidebar">False</property>
+            <property name="sidebar">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="show-title">False</property>
+                    <child type="start">
+                      <object class="GtkToggleButton" id="favorites_filter_button">
+                        <property name="icon-name">non-starred-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Show Favorites Only</property>
+                        <property name="action-name">win.toggle-favorites</property>
+                      </object>
+                    </child>
+                    <child type="end">
+                      <object class="GtkButton" id="clear_history_button">
+                        <property name="icon-name">user-trash-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Clear History</property>
+                        <property name="sensitive">False</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <property name="content">
+                  <object class="AdwViewStack" id="history_stack">
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">list</property>
+                        <property name="child">
+                          <object class="GtkScrolledWindow">
+                            <property name="hscrollbar-policy">never</property>
+                            <property name="child">
+                              <object class="GtkListBox" id="history_listbox">
+                                <property name="selection-mode">none</property>
+                                <style>
+                                  <class name="navigation-sidebar"/>
+                                </style>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">empty</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="icon-name">document-open-recent-symbolic</property>
+                            <property name="title" translatable="yes">No History</property>
+                            <style>
+                              <class name="compact"/>
+                            </style>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+            <property name="content">
+              <object class="AdwToolbarView">
+                <child type="top">
+                  <object class="AdwHeaderBar">
+                    <property name="centering-policy">strict</property>
+                    <child type="start">
+                      <object class="GtkToggleButton" id="split_view_toggle_button">
+                        <property name="icon-name">sidebar-show-symbolic</property>
+                        <property name="tooltip-text" translatable="yes">Toggle History</property>
+                      </object>
+                    </child>
+                    <property name="title-widget">
+                      <object class="AdwClamp" id="title_clamp">
+                        <property name="maximum-size">420</property>
+                        <property name="tightening-threshold">320</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="spacing">6</property>
+                            <child>
+                              <object class="GtkEntry" id="search_entry">
+                                <property name="hexpand">True</property>
+                                <property name="placeholder-text" translatable="yes">Search for a word</property>
+                                <property name="activates-default">True</property>
+                                <property name="enable-emoji-completion">False</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="search_button">
+                                <property name="icon-name">edit-find-symbolic</property>
+                                <property name="tooltip-text" translatable="yes">Search</property>
+                                <style>
+                                  <class name="suggested-action"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                    <child type="end">
+                      <object class="GtkMenuButton" id="dictionary_menu_button">
+                        <property name="icon-name">open-menu-symbolic</property>
+                        <property name="menu-model">primary_menu</property>
+                        <property name="primary">True</property>
+                        <property name="tooltip-text" translatable="yes">Main Menu</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <property name="content">
+                  <object class="AdwViewStack" id="main_stack">
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">content_page</property>
+                        <property name="child">
+                          <object class="GtkScrolledWindow" id="main_scroll">
+                            <property name="hscrollbar-policy">never</property>
+                            <property name="child">
+                              <object class="AdwClamp">
+                                <property name="maximum-size">760</property>
+                                <property name="tightening-threshold">560</property>
+                                <property name="child">
+                                  <object class="GtkListBox" id="definitions_listbox">
+                                    <property name="selection-mode">none</property>
+                                    <property name="margin-top">12</property>
+                                    <property name="margin-bottom">12</property>
+                                    <property name="margin-start">12</property>
+                                    <property name="margin-end">12</property>
+                                    <style>
+                                      <class name="boxed-list"/>
+                                    </style>
+                                  </object>
+                                </property>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">db_error_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="icon-name">dialog-error-symbolic</property>
+                            <property name="title" translatable="yes">Dictionary Data Missing</property>
+                            <property name="description" translatable="yes">The dictionary database could not be found or loaded. Choose where it is stored, or exit.</property>
+                            <property name="child">
+                              <object class="GtkBox">
+                                <property name="orientation">vertical</property>
+                                <property name="spacing">12</property>
+                                <property name="halign">center</property>
+                                <child>
+                                  <object class="GtkButton" id="choose_db_button">
+                                    <property name="label" translatable="yes">Choose Database…</property>
+                                    <property name="halign">center</property>
+                                    <style>
+                                      <class name="pill"/>
+                                      <class name="suggested-action"/>
+                                    </style>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="exit_button">
+                                    <property name="label" translatable="yes">Exit</property>
+                                    <property name="halign">center</property>
+                                    <style>
+                                      <class name="pill"/>
+                                    </style>
+                                  </object>
+                                </child>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">search_fail_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="icon-name">edit-find-symbolic</property>
+                            <property name="title" translatable="yes">No Definitions Found</property>
+                            <property name="description" translatable="yes">Check the spelling or try another word.</property>
+                            <property name="child">
+                              <object class="GtkLabel" id="search_fail_description_label">
+                                <property name="visible">False</property>
+                                <property name="use-markup">True</property>
+                                <property name="wrap">True</property>
+                                <property name="justify">center</property>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">spinner_page</property>
+                        <property name="child">
+                          <object class="GtkSpinner">
+                            <property name="spinning">True</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <property name="width-request">32</property>
+                            <property name="height-request">32</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="AdwViewStackPage">
+                        <property name="name">welcome_page</property>
+                        <property name="child">
+                          <object class="AdwStatusPage">
+                            <property name="icon-name">accessories-dictionary-symbolic</property>
+                            <property name="title" translatable="yes">Dictionary</property>
+                            <property name="description" translatable="yes">Search for a word to see its definitions.</property>
+                            <property name="child">
+                              <object class="AdwClamp">
+                                <property name="maximum-size">700</property>
+                                <property name="tightening-threshold">500</property>
+                                <property name="child">
+                                  <object class="GtkBox" id="welcome_words_box">
+                                    <property name="orientation">horizontal</property>
+                                    <property name="halign">center</property>
+                                    <property name="valign">start</property>
+                                    <property name="spacing">16</property>
+                                    <property name="margin-top">24</property>
+                                  </object>
+                                </property>
+                              </object>
+                            </property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </property>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>
